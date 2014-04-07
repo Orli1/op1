@@ -2,82 +2,142 @@
 Arielle Leone
 Optional Project #1
   */
-import java.lang.*;
 import java.util.*;
 import java.io.*;
 
 class Driver{
   public static void main(String[] args){
-    String infix = "";
-    String postfix = "";
-    int priority=0;
-    
+    String input = readstring();
     Driver welObj=new Driver();
     welObj.Welcome(); //outputs program purpose
-    String line="";
-    Stack stack =new Stack();
-    Queue queue =new Queue();
-    
+    Driver calObj=new Driver();
+    String conversion=calObj.InfixtoPostfix(input);
+    System.out.println("InFix: " + input);
+    System.out.println("PostFix: " + conversion);
+  }
+  public static String readstring(){ 
+   String input="";
    try{
         BufferedReader sc=new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Enter an infix expression: "); 
-        line=sc.readLine(); 
+        input=sc.readLine(); 
         }
      catch (Exception e){
         e.printStackTrace();
       }
-   for(int i=0; i<line.length(); i++){
-     char ch = line.charAt(i);
+     return input;
+  }
+  public String InfixtoPostfix(String input){
+    Stack myS =new Stack();
+    Queue myQ =new Queue();
+    
+    String infix = "";
+    String postfix = "";
+    String answer="";
+    String regex= "[-+*/^x()]";
+    String line="("+input+")";
+    
+    System.out.println(line);
+    
+    String[]temp=line.split(regex);
+    
+    System.out.println(temp);
+   
+    for(int i=0; i<temp.length; i++){
+     String token = temp[i];
+    
+     System.out.println(token);
+     
+     char ch=token.charAt(0);
     // System.out.println(ch);
      if(Character.isDigit(ch)){
-       System.out.println(ch);
-       //queue
+      // System.out.println(ch);
+       myQ.enqueue(token);
      }    
-     if(ch=='('){
-     stack.push(ch);
+     else if(ch=='('){
+     myS.push(token);
      }
-     if(ch==')'){
-     stack.pop();
-        while(stack.peek() != '('){
-        postfix += stack.pop();
-        stack.pop();}
+     else if(ch==')'){
+     myS.pop();
+        while(myS.peek() != '('){
+        myQ.enqueue(myS.pop());
+        }
    }
-     if(ch == '+' || ch == '-' || ch == '*' || ch == '/')
-          {
-       if (stack.size() <= 0){
-                  stack.push(ch);
-           }  
-        else{
-                  Character chTop = (Character) stack.peek();
-                  if (chTop == '*' || chTop == '/')
-                     priority = 1;
-                  else
-                     priority = 0;
-                  if (priority == 1)
-                  {
-                     if (ch == '+' || ch == '-')
-                     {
-                        postfix += stack.pop();
-                        i--;
+     else{
+       while(!myS.isEmpty()){ ////////////////////
+         while(symbol(ch) <= symbol(((String) myS.peek()).charAt(0))) 
+ {
+         myQ.enqueue(myS.pop());
                      }
-                     else
-                     { // Same
-                        postfix += stack.pop();
-                        i--;
-                     }
-                  }
-                  else
-                  {
-                     if (ch == '+' || ch == '-')
-                     {
-                        postfix += stack.pop();
-                        stack.push(ch);
-                     }
-                     else
-                        stack.push(ch);
-                  }
-               }
-     }}}
+                     myS.push(token);
+       }}
+                  }  
+         while (!myQ.isEmpty()) {
+             answer += myQ.peek();
+             answer += " ";
+             myQ.dequeue();
+         }
+         return answer;            
+    }
+  public int symbol(char ch){
+    switch(ch){     
+    case '+':
+    case '-':
+      return 1;
+    case '*':
+    case 'x':
+    case '/':
+      return 2;
+    case '^': 
+      return 3;
+    default: 
+      return 0;
+    }
+  }
+  public double evaluate(String answer) {
+
+         Stack myS = new Stack();
+         Queue myQ = new Queue();
+         double result = 0.0;
+          
+         String[]temp=answer.split("[+-^*/()]");
+             for(int i=0; i<temp.length; i++){
+                String token = temp[i];
+                char ch=token.charAt(0);
+
+             if (!token.equals(" ")) {
+         
+                 if (Character.isDigit(ch)){
+                     myS.push(token);
+             
+                 } else {
+                     float top = Float.parseFloat(String.valueOf(myS.pop()));
+                     float next = Float.parseFloat(String.valueOf(myS.pop()));
+                     result = calculateOperation(next, top, ch);
+                    myS.push(result);
+                 } 
+             }
+         }    
+         return result;
+     }
+     public float calculateOperation(float top, float next, char ch){
+         switch(ch){
+           case '^':
+                 return (int)Math.pow(top,next);
+           case '+':
+                 return top + next;
+             case '*':
+             case 'x':
+                 return top * next;
+             case '/':
+                 return top / next;
+             case '-':
+                 return top - next;
+             default:
+                 System.out.println("Invalid operation.");
+                 return 0;   
+         }    
+     }
 public void Welcome(){
     System.out.println("Welcome. This program takes the input of infix expressions, converts");
     System.out.println("them to postfix expressions, and evaluates the results.");
