@@ -9,86 +9,140 @@ import java.io.*;
 
 class Driver1{ 
    public static void main(String[] args){
-     //System.out.println("Welcome. This program traverses a map of the United States, printing out each State name");
-     //System.out.println("in the order it was visited using both depth and breadth traversal.");
-     Map mapObject= new Map();
-     mapObject.input(); 
+     System.out.println("Welcome. This program traverses a map of the United States, printing out each State name");
+     System.out.println("in the order it was visited using both depth and breadth traversal.");
+     System.out.println("");
+     
+     Node[] mapObject1=readInput();
+     Node[] mapObject2=readInput();
+     Map depthObject = new Map(mapObject1);
+     Map breadthObject = new Map(mapObject2);
+     
+     System.out.println("This program will now list the states using depth first.");
+     System.out.println("               ~~Depth First Results~~");
+     depthObject.Depth(mapObject1[0]);
+     System.out.println("");
+     System.out.println("This program will now list the states using breadth first.");
+     System.out.println("              ~~Breadth First Results~~");
+     breadthObject.Breadth(mapObject2[0]);
    }
-}  
-class Map{
-    public Node[] graph;
-    public void input(){
-        this.graph=new Node[48];
-        BufferedReader textdata=null;
-        String data;
-        int counter;
-        
-        try{
-          textdata = new BufferedReader(new FileReader("state_data.txt"));
-          //System.out.println("File open successful!"); //debugging
-   
-            for(counter=0; counter<this.graph.length; counter++){
-                data=textdata.readLine();
+ public static Node[] readInput(){
+      String data;
+      int counter;  
+      BufferedReader textdata=null;
+      Node[] graph=new Node[48];
+      try{
+          textdata=new BufferedReader(new FileReader("state_data.txt"));
+          //System.out.println("File open!"); //debugging
+            
+          int num=graph.length;
+          for(counter=0; counter<num; counter++){
+              Node newNode=new Node(counter+1, null, false);
+              Node front = newNode;    
+              
+              data=textdata.readLine();
               // System.out.println(data); //debugging
                 
-                StringTokenizer token=new StringTokenizer(data);
-                //System.out.println(token.nextElement());
-            
-                Node newNode = new Node(counter+1, null, false);
-                Node front = newNode;
-                
-                do{
-                    newNode.next = new Node(Integer.parseInt(token.nextToken()), null, false);
-                    newNode = newNode.next;
+               StringTokenizer token=new StringTokenizer(data);
+               //System.out.println(token.nextElement()); //debugging
+               do{
+                    newNode.step=new Node(Integer.parseInt(token.nextToken()), null, false);
+                    newNode=newNode.step;
                 }while(token.hasMoreTokens());
-               // System.out.println(newNode.data);  //debugging
+               // System.out.println(newNode.info);  //debugging
               
-                this.graph[counter]=front;
+                graph[counter]=front;
             }
             textdata.close();
-           // Node k=this.graph[0];
-            //System.out.println("lalala");
-           // System.out.println(k.data); 
+           // Node k=graph[0];       
+           // System.out.println(k.info);  //debugging
         } 
         catch(IOException e){
           System.out.println("File I/O error!");
         }
-       //////////////////
-        System.out.println("Traversal using Depth: ");
-        Depth(this.graph[0]); 
+        return graph;
     }
-    public void Depth(Node p){
-     
-        if(p.traverse==true){
-        p=p.next;
-        Depth(p);
+  }  
+class Map{
+    public Node[] graph;
+  
+     public void Breadth(Node a){
+       Queue myQueue = new Queue();
+       States stateObject= new States();
+       
+       if(a.traverse==true){
+         a=a.step;
+         Breadth(a);
+       }
+       else{ 
+         stateObject.printStates(a.info);
+         a.traverse=true;
+         myQueue.enqueue(a.info);
+      
+         int counter= myQueue.N;
+      
+         while(!myQueue.isEmpty()){
+            int oldData=(Integer)myQueue.dequeue();
+            //System.println(oldData); //debugging
+            Node myNode=this.graph[oldData-1];
+            myNode=myNode.step;
+            while(myNode.step!=null){
+              counter++;
+              int next=myNode.info;
+              //System.out.println(next);//debugging
+              Node nextNode=this.graph[next-1];
+              //System.out.println(nextNode.info); //debugging
+              
+              if(nextNode.traverse!=true){
+                  //counter--;
+                  myQueue.enqueue(nextNode.info);
+                  stateObject.printStates(nextNode.info);
+                  nextNode.traverse=true;
+                }
+                else{
+                 ;}
+               myNode=myNode.step;
+            }
+        }      
+     }
+  }
+   public void Depth(Node a){
+       Stack myStack=new Stack();
+        
+       if(a.traverse==true){
+        a=a.step;
+        Depth(a);
         }
+       else{ 
+        States stateObject= new States();
+        stateObject.printStates(a.info);
+        a.traverse= true;
         
-        else{
-        Node myNode = p;
-        p.traverse= true;
-        
-        Map stateObject= new Map();
-        stateObject.printStates(p.data);
-        for(Node node = myNode; node != null; node = node.next){
-         // System.out.println(node.data); //debugging
+        for(Node node1=a; node1!=null; node1=node1.step){
+      //   System.out.println(node.data); //debugging
         }
        
-        for(Node node = myNode; node != null; node = node.next){
-          if(p.next != null){
-                int nextNode=p.next.data;
-                Node q=this.graph[nextNode-1];
+        for(Node node=a; node!=null; node=node.step){
+          if(a.step!=null){
+                int next=a.step.info;
+                Node b=this.graph[next-1];
                 
                 //System.out.println(q.data);
-                if(q.traverse==false){
-                  Depth(q);
+                if(b.traverse!=true){
+                  Depth(b);
                 }
-                p = p.next;
+                a=a.step;
             }
             else{
               ;}
         }}
-    }
+        
+     }
+public Map(Node[] graph){
+        this.graph = graph;
+}
+}
+class States{
     public void printStates(int p){
       switch(p){
             case 1: 
@@ -235,67 +289,72 @@ class Map{
             case 48: 
                 System.out.println("Florida");
                 break;
-}}}
-    
-class Node{
-    int data;
-    Node next;
-    boolean traverse;
-    
-    public Node(){
-        data=0;
-        next=null;
-        traverse=false;
-    }
-    public Node(int a, Node node, boolean b) {  
-        data=a;
-        next=node;
-        traverse=b;
-    }
-}
-class Stack {
-    public Node top;
-    public void push(Node item){
-        top = new Node(item.data, top, true);
-    }
-    public Node pop(){
-        Node oldNode = top;
-        Node item = peek();
-        top = top.next;
-        oldNode.next = null;
-        return item;
-    }
-    public Node peek(){
-        if (isEmpty()) throw new NullPointerException();
-        return top;
-    }
-    public boolean isEmpty(){
-        return top == null;
-    }
-}
+      }}}
 class Queue{
-    public Node first;
-    public Node last;
-    public void enq(Object item){
+  public int N;  
+  public Node first;
+  public Node last;
+  public Queue(){
+     first = null;
+     last  = null;
+      N=0;
+    }
+    public void enqueue(Object object){
         Node oldNode = last;
         last = new Node();
-        last.data = (Integer) item;
-        last.next = null;
+        last.info= (Integer)object;
+        last.step = null;
         if (isEmpty()) first = last;
-        else oldNode.next = last;
+        else oldNode.step= last;
     } 
-    public Object dnq(){
-        if (isEmpty()) throw new NullPointerException();
-        Object data = first.data;
-        first = first.next;
+    public Object dequeue(){
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
+        Object data = first.info;
+        first = first.step;
         if (isEmpty()) last = null;
         return data;      
     }
      public Object peek(){
-        if (isEmpty()) throw new NullPointerException();
-        return first.data;
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
+        return first.info;
     }
     public boolean isEmpty(){
         return first == null;
+    }
+}    
+class Node{
+    int info;
+    Node step;
+    boolean traverse;
+    
+    public Node(){
+        info=0;
+        step=null;
+        traverse=false;
+    }
+    public Node(int a, Node node, boolean b){  
+        info=a;
+        step=node;
+        traverse=b;
+    }
+}
+class Stack{
+    public Node top;
+    public void push(Node object){
+        top = new Node(object.info, top, true);
+    }
+    public Node pop(){
+        Node oldNode = top;
+        Node object = peek();
+        top = top.step;
+        oldNode.step= null;
+        return object;
+    }
+    public Node peek(){
+        if (isEmpty()) throw new NoSuchElementException("Stack underflow");
+        return top;
+    }
+    public boolean isEmpty(){
+        return top == null;
     }
 }
