@@ -58,7 +58,39 @@ class Map{
         Depth(this.graph[0]); 
     }
     public void Depth(Node p){
-        switch(p.data){
+     
+        if(p.traverse==true){
+        p=p.next;
+        Depth(p);
+        }
+        
+        else{
+        Node myNode = p;
+        p.traverse= true;
+        
+        Map stateObject= new Map();
+        stateObject.printStates(p.data);
+        for(Node node = myNode; node != null; node = node.next){
+         // System.out.println(node.data); //debugging
+        }
+       
+        for(Node node = myNode; node != null; node = node.next){
+          if(p.next != null){
+                int nextNode=p.next.data;
+                Node q=this.graph[nextNode-1];
+                
+                //System.out.println(q.data);
+                if(q.traverse==false){
+                  Depth(q);
+                }
+                p = p.next;
+            }
+            else{
+              ;}
+        }}
+    }
+    public void printStates(int p){
+      switch(p){
             case 1: 
                 System.out.println("Washington");
                 break;
@@ -203,40 +235,8 @@ class Map{
             case 48: 
                 System.out.println("Florida");
                 break;
-        }
-        int nodeCounter=0;
-        
-        if(p.traverse==true){
-        p=p.next;
-        Depth(p);
-        }
-        else{
-        Node myNode = p;
-        p.traverse= true;
-       
-        for(Node node = myNode; node != null; node = node.next){
-          System.out.println(node.data); //debugging
-        }
-        do{
-            nodeCounter++;
-            myNode=myNode.next;
-        }while(myNode!= null);
-        
-        for(int k=0; k<nodeCounter; k++){
-            if(p.next != null){
-                int nextNode=p.next.data;
-                Node q=this.graph[nextNode-1];
-                //System.out.println(q.data);
-                if(q.traverse==false){
-                  Depth(q);
-                }
-                p = p.next;
-            }
-            else{
-              ;}
-        }}
-    }
-}
+}}}
+    
 class Node{
     int data;
     Node next;
