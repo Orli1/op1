@@ -215,12 +215,12 @@ class Map{
         p.traverse= true;
        
         for(Node node = myNode; node != null; node = node.next){
-          System.out.println(myNode.data); //debugging
+          System.out.println(node.data); //debugging
         }
         do{
             nodeCounter++;
             myNode=myNode.next;
-        }while(myNode != null);
+        }while(myNode!= null);
         
         for(int k=0; k<nodeCounter; k++){
             if(p.next != null){
